@@ -38,6 +38,7 @@ import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.preference.Preference;
+import android.preference.ListPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
@@ -74,6 +75,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
     private static final String KEY_MOBILE_NETWORK_SETTINGS = "mobile_network_settings";
     private static final String KEY_MANAGE_MOBILE_PLAN = "manage_mobile_plan";
     private static final String KEY_SMS_APPLICATION = "sms_application";
+    private static final String KEY_NFC_POLLING_MODE = "nfc_polling_mode";
     private static final String KEY_TOGGLE_NSD = "toggle_nsd"; //network service discovery
     private static final String KEY_CELL_BROADCAST_SETTINGS = "cell_broadcast_settings";
 
@@ -86,6 +88,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
     private NfcAdapter mNfcAdapter;
     private NsdEnabler mNsdEnabler;
 
+    private ListPreference mNfcPollingMode;
     private ConnectivityManager mCm;
     private TelephonyManager mTm;
     private PackageManager mPm;
@@ -287,8 +290,14 @@ public class WirelessSettings extends SettingsPreferenceFragment
         PreferenceScreen androidBeam = (PreferenceScreen) findPreference(KEY_ANDROID_BEAM_SETTINGS);
         SwitchPreference nsd = (SwitchPreference) findPreference(KEY_TOGGLE_NSD);
 
+        mNfcPollingMode = (ListPreference) findPreference(KEY_NFC_POLLING_MODE);
+        mNfcPollingMode.setOnPreferenceChangeListener(this);
+        mNfcPollingMode.setValue((Settings.System.getInt(activity.getContentResolver(),
+                Settings.System.NFC_POLLING_MODE, 3)) + "");
+        updateNfcPolling();
+
         mAirplaneModeEnabler = new AirplaneModeEnabler(activity, mAirplaneModePreference);
-        mNfcEnabler = new NfcEnabler(activity, nfc, androidBeam);
+        mNfcEnabler = new NfcEnabler(activity, nfc, androidBeam, mNfcPollingMode);
 
         mSmsApplicationPreference = (AppListPreference) findPreference(KEY_SMS_APPLICATION);
         // Restricted users cannot currently read/write SMS.
@@ -346,6 +355,7 @@ public class WirelessSettings extends SettingsPreferenceFragment
         mNfcAdapter = NfcAdapter.getDefaultAdapter(activity);
         if (mNfcAdapter == null) {
             getPreferenceScreen().removePreference(nfc);
+            getPreferenceScreen().removePreference(mNfcPollingMode);
             getPreferenceScreen().removePreference(androidBeam);
             mNfcEnabler = null;
         }
@@ -480,10 +490,31 @@ public class WirelessSettings extends SettingsPreferenceFragment
         return R.string.help_url_more_networks;
     }
 
+    private void updateNfcPolling() {
+        int resId;
+        String value = Settings.System.getString(getContentResolver(),
+                Settings.System.NFC_POLLING_MODE);
+        String[] pollingArray = getResources().getStringArray(R.array.nfc_polling_mode_values);
+        if (pollingArray[0].equals(value)) {
+            resId = R.string.nfc_polling_mode_screen_locked;
+            mNfcPollingMode.setValueIndex(0);
+        } else {
+            resId = R.string.nfc_polling_mode_screen_unlocked;
+            mNfcPollingMode.setValueIndex(1);
+        }
+        mNfcPollingMode.setSummary(getResources().getString(resId));
+    }
+
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (preference == mSmsApplicationPreference && newValue != null) {
             SmsApplication.setDefaultApplication(newValue.toString(), getActivity());
+            return true;
+        }  else if (preference == mNfcPollingMode) {
+            int newVal = Integer.parseInt((String) newValue);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.NFC_POLLING_MODE, newVal);
+            updateNfcPolling();
             return true;
         }
         return false;
