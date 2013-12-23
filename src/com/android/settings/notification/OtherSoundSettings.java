@@ -74,6 +74,7 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private static final String PROP_CAMERA_SOUND = "persist.sys.camera-sound";
     private static final String KEY_SAFE_HEADSET_VOLUME = "safe_headset_volume";
     private static final String PREF_LESS_NOTIFICATION_SOUNDS = "less_notification_sounds";
+    private static final String KEY_VOL_MEDIA = "volume_keys_control_media_stream";
     private static final String KEY_SCREEN_LOCKING_SOUNDS = "screen_locking_sounds";
     private static final String KEY_DOCKING_SOUNDS = "docking_sounds";
     private static final String KEY_VOLUME_ADJUST_SOUNDS = "volume_adjust_sounds";
@@ -96,6 +97,7 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private SwitchPreference mPowerSoundsVibrate;
     private Preference mPowerSoundsRingtone;
     private SwitchPreference mCameraSounds;
+    private SwitchPreference mVolumeKeysControlMedia;
     private SwitchPreference mSafeHeadsetVolume;
     private ListPreference mAnnoyingNotifications;
 
@@ -239,6 +241,11 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         mAnnoyingNotifications.setValue(Integer.toString(notificationThreshold));
         mAnnoyingNotifications.setOnPreferenceChangeListener(this);
 
+        mVolumeKeysControlMedia = (SwitchPreference) findPreference(KEY_VOL_MEDIA);
+        mVolumeKeysControlMedia.setChecked(Settings.System.getInt(getContentResolver(),
+                Settings.System.VOLUME_KEYS_CONTROL_MEDIA_STREAM, 0) != 0);
+        mVolumeKeysControlMedia.setOnPreferenceChangeListener(this);
+
         // set to default notification if we don't yet have one
         if (currentPowerRingtonePath == null) {
                 currentPowerRingtonePath = System.DEFAULT_NOTIFICATION_URI.toString();
@@ -319,6 +326,11 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
             } else {
                 showDialogInner(DLG_CAMERA_SOUND);
             }
+        }
+        if (KEY_VOL_MEDIA.equals(key)) {
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.VOLUME_KEYS_CONTROL_MEDIA_STREAM,
+                    (Boolean) objValue ? 1 : 0);
         }
         return true;
     }
