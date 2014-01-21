@@ -55,6 +55,13 @@
         android:fragment="com.android.settings.desolation.InputMethods" />
 
     <PreferenceScreen
+        android:key="navigation_settings"
+        android:title="@string/navigation_settings_title"
+        android:summary="@string/navigation_settings_summary"
+        android:icon="@drawable/ic_settings_navigation"
+        android:fragment="com.android.settings.desolation.NavigationSettings" />
+
+    <PreferenceScreen
         android:key="network_traffic"
         android:title="@string/network_traffic_title"
         android:summary="@string/network_traffic_summary"
