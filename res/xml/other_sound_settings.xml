@@ -134,4 +134,9 @@
             android:dependency="power_notifications"
             android:persistent="false" />
 
+    <PreferenceScreen
+            android:key="volume_steps"
+            android:fragment="com.android.settings.infusion.preference.VolumeSteps"
+            android:title="@string/volume_steps_title" />
+
 </PreferenceScreen>
