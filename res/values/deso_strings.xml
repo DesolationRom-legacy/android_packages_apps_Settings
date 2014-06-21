@@ -621,4 +621,8 @@
     <string name="notification_force_expand_title">Force expanded notification</string>
     <string name="notification_force_expand_summary">Force expanded notifications on all apps that support it</string>
 
+    <!-- Diable immersive messages -->
+    <string name="disable_immersive_message_title">Diable immersive messages</string>
+    <string name="disable_immersive_message_summary">This will hide all immersive mode messages</string>
+
 </resources>
