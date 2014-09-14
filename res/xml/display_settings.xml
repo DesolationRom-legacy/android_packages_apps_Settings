@@ -38,6 +38,12 @@
                 android:title="@string/display_rotation_title"
                 android:fragment="com.android.settings.desolation.DisplayRotation" />
 
+        <com.android.settings.desolation.SystemSettingSwitchPreference
+                android:key="double_tap_sleep_gesture"
+                android:title="@string/double_tap_to_sleep_title"
+                android:summary="@string/double_tap_to_sleep_summary"
+                android:defaultValue="true" />
+
         <ListPreference
                 android:key="screen_timeout"
                 android:title="@string/screen_timeout"
