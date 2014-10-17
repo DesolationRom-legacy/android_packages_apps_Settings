@@ -53,6 +53,7 @@ public class StatusBar extends SettingsPreferenceFragment
     private static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
     private static final String STATUS_BAR_CARRIER_COLOR = "status_bar_carrier_color";
     private static final String KEY_STATUS_BAR_NETWORK_ARROWS= "status_bar_show_network_activity";
+    private static final String KEY_STATUS_BAR_TICKER = "status_bar_ticker";
 
     private static final String NOTIF_ACCENT_COLOR = "notif_accent_color";
     private static final String NOTIF_ACCENT_COLOR_DEFAULT = "notif_accent_default";
@@ -66,6 +67,7 @@ public class StatusBar extends SettingsPreferenceFragment
     private SwitchPreference mNetworkArrows;
     private SwitchPreference mNotifAccentColor;
     private SwitchPreference mNotifRandomAccentColor;
+    private SwitchPreference mTicker;
 
     private String mCustomCarrierLabelText;
     private ColorPickerPreference mCarrierColorPicker;
@@ -129,6 +131,12 @@ public class StatusBar extends SettingsPreferenceFragment
                 Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY, 1);
         updateNetworkArrowsSummary(networkArrows);
 
+
+        mTicker = (SwitchPreference) prefSet.findPreference(KEY_STATUS_BAR_TICKER);
+        mTicker.setChecked(Settings.System.getInt(
+              getContentResolver(), Settings.System.TICKER_ENABLED, 0) == 1);
+        mTicker.setOnPreferenceChangeListener(this);
+
         if (TelephonyManager.getDefault().isMultiSimEnabled()
                 || Utils.isWifiOnly(getActivity())) {
             prefSet.removePreference(mStatusBarCarrier);
@@ -187,6 +195,10 @@ public class StatusBar extends SettingsPreferenceFragment
             int networkArrows = Settings.System.getInt(getContentResolver(),
                     Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY, 1);
             updateNetworkArrowsSummary(networkArrows);
+            return true;
+        } else if (preference == mTicker) {
+            Settings.System.putInt(resolver, Settings.System.TICKER_ENABLED,
+                    (Boolean) newValue ? 1 : 0);
             return true;
         }
         return false;
