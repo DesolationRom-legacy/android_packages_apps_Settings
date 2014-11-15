@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.os.SystemProperties;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
@@ -56,6 +57,7 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private static final String TAG = "OtherSoundSettings";
 
     private static final int DEFAULT_ON = 1;
+    private static final int DLG_SAFE_HEADSET_VOLUME = 0;
     private static final int DLG_CAMERA_SOUND = 1;
 
     private static final int EMERGENCY_TONE_SILENT = 0;
@@ -70,6 +72,8 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private static final String KEY_DIAL_PAD_TONES = "dial_pad_tones";
     private static final String KEY_CAMERA_SOUNDS = "camera_sounds";
     private static final String PROP_CAMERA_SOUND = "persist.sys.camera-sound";
+    private static final String KEY_SAFE_HEADSET_VOLUME = "safe_headset_volume";
+    private static final String PREF_LESS_NOTIFICATION_SOUNDS = "less_notification_sounds";
     private static final String KEY_SCREEN_LOCKING_SOUNDS = "screen_locking_sounds";
     private static final String KEY_DOCKING_SOUNDS = "docking_sounds";
     private static final String KEY_VOLUME_ADJUST_SOUNDS = "volume_adjust_sounds";
@@ -92,6 +96,8 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private SwitchPreference mPowerSoundsVibrate;
     private Preference mPowerSoundsRingtone;
     private SwitchPreference mCameraSounds;
+    private SwitchPreference mSafeHeadsetVolume;
+    private ListPreference mAnnoyingNotifications;
 
     private static final SettingPref PREF_DIAL_PAD_TONES = new SettingPref(
             TYPE_SYSTEM, KEY_DIAL_PAD_TONES, System.DTMF_TONE_WHEN_DIALING, DEFAULT_ON) {
@@ -222,6 +228,17 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         mCameraSounds.setChecked(SystemProperties.getBoolean(PROP_CAMERA_SOUND, true));
         mCameraSounds.setOnPreferenceChangeListener(this);
 
+        mSafeHeadsetVolume = (SwitchPreference) findPreference(KEY_SAFE_HEADSET_VOLUME);
+        mSafeHeadsetVolume.setChecked(Settings.System.getInt(getContentResolver(),
+                Settings.System.SAFE_HEADSET_VOLUME, 1) != 0);
+        mSafeHeadsetVolume.setOnPreferenceChangeListener(this);
+
+        mAnnoyingNotifications = (ListPreference) findPreference(PREF_LESS_NOTIFICATION_SOUNDS);
+        int notificationThreshold = Settings.System.getInt(getContentResolver(),
+                Settings.System.MUTE_ANNOYING_NOTIFICATIONS_THRESHOLD, 0);
+        mAnnoyingNotifications.setValue(Integer.toString(notificationThreshold));
+        mAnnoyingNotifications.setOnPreferenceChangeListener(this);
+
         // set to default notification if we don't yet have one
         if (currentPowerRingtonePath == null) {
                 currentPowerRingtonePath = System.DEFAULT_NOTIFICATION_URI.toString();
@@ -283,6 +300,19 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
 
     public boolean onPreferenceChange(Preference preference, Object objValue) {
         final String key = preference.getKey();
+        if (KEY_SAFE_HEADSET_VOLUME.equals(key)) {
+            if ((Boolean) objValue) {
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.SAFE_HEADSET_VOLUME, 1);
+            } else {
+                showDialogInner(DLG_SAFE_HEADSET_VOLUME);
+            }
+        }
+        if (PREF_LESS_NOTIFICATION_SOUNDS.equals(key)) {
+            final int val = Integer.valueOf((String) objValue);
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.MUTE_ANNOYING_NOTIFICATIONS_THRESHOLD, val);
+        }
         if (KEY_CAMERA_SOUNDS.equals(key)) {
             if ((Boolean) objValue) {
                 SystemProperties.set(PROP_CAMERA_SOUND, "1");
@@ -290,7 +320,6 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
                 showDialogInner(DLG_CAMERA_SOUND);
             }
         }
-
         return true;
     }
 
@@ -382,6 +411,12 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         }
     }
 
+    private void showDialogInner(int id) {
+        DialogFragment newFragment = MyAlertDialogFragment.newInstance(id);
+        newFragment.setTargetFragment(this, 0);
+        newFragment.show(getFragmentManager(), "dialog " + id);
+    }
+
     public static class MyAlertDialogFragment extends DialogFragment {
 
         public static MyAlertDialogFragment newInstance(int id) {
@@ -400,6 +435,25 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int id = getArguments().getInt("id");
             switch (id) {
+                case DLG_SAFE_HEADSET_VOLUME:
+                    return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.attention)
+                    .setMessage(R.string.safe_headset_volume_warning_dialog_text)
+                    .setPositiveButton(R.string.dlg_ok,
+                        new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Settings.System.putInt(getOwner().getContentResolver(),
+                                    Settings.System.SAFE_HEADSET_VOLUME, 0);
+
+                        }
+                    })
+                    .setNegativeButton(R.string.dlg_cancel,
+                        new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .create();
                 case DLG_CAMERA_SOUND:
                     return new AlertDialog.Builder(getActivity())
                     .setTitle(R.string.attention)
@@ -425,6 +479,9 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         public void onCancel(DialogInterface dialog) {
             int id = getArguments().getInt("id");
             switch (id) {
+                case DLG_SAFE_HEADSET_VOLUME:
+                    getOwner().mSafeHeadsetVolume.setChecked(true);
+                    break;
                 case DLG_CAMERA_SOUND:
                     getOwner().mCameraSounds.setChecked(true);
                     break;
