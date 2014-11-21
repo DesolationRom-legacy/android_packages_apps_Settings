@@ -61,4 +61,10 @@
         android:summary="@string/recent_apps_summary"
         android:fragment="com.android.settings.desolation.RecentApps" />
 
+    <PreferenceScreen
+        android:key="status_bar"
+        android:title="@string/status_bar_title"
+        android:summary="@string/status_bar_summary"
+        android:fragment="com.android.settings.desolation.StatusBar" />
+
 </PreferenceScreen>

@@ -521,4 +521,10 @@
     <!-- No SIM number -->
     <string name="sim_no_number_set">No number assigned</string>
 
+    <!-- Status bar -->
+    <string name="status_bar_title">Status bar</string>
+    <string name="status_bar_summary">Alter your status bar in many ways</string>
+    <string name="status_bar_toggle_brightness_title">Brightness control</string>
+    <string name="status_bar_toggle_brightness_summary">Adjust brightness by sliding across the status bar</string>
+
 </resources>
