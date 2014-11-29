@@ -20,8 +20,12 @@ import static com.android.settings.notification.SettingPref.TYPE_GLOBAL;
 import static com.android.settings.notification.SettingPref.TYPE_SYSTEM;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -32,12 +36,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.os.SystemProperties;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.provider.Settings.Global;
 import android.provider.Settings.System;
 import android.telephony.TelephonyManager;
+import android.provider.Settings;
+import android.util.Log;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
@@ -49,6 +56,7 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private static final String TAG = "OtherSoundSettings";
 
     private static final int DEFAULT_ON = 1;
+    private static final int DLG_CAMERA_SOUND = 1;
 
     private static final int EMERGENCY_TONE_SILENT = 0;
     private static final int EMERGENCY_TONE_ALERT = 1;
@@ -60,6 +68,8 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private static final int DEFAULT_DOCK_AUDIO_MEDIA = DOCK_AUDIO_MEDIA_DISABLED;
 
     private static final String KEY_DIAL_PAD_TONES = "dial_pad_tones";
+    private static final String KEY_CAMERA_SOUNDS = "camera_sounds";
+    private static final String PROP_CAMERA_SOUND = "persist.sys.camera-sound";
     private static final String KEY_SCREEN_LOCKING_SOUNDS = "screen_locking_sounds";
     private static final String KEY_DOCKING_SOUNDS = "docking_sounds";
     private static final String KEY_VOLUME_ADJUST_SOUNDS = "volume_adjust_sounds";
@@ -81,6 +91,7 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
     private SwitchPreference mPowerSounds;
     private SwitchPreference mPowerSoundsVibrate;
     private Preference mPowerSoundsRingtone;
+    private SwitchPreference mCameraSounds;
 
     private static final SettingPref PREF_DIAL_PAD_TONES = new SettingPref(
             TYPE_SYSTEM, KEY_DIAL_PAD_TONES, System.DTMF_TONE_WHEN_DIALING, DEFAULT_ON) {
@@ -207,6 +218,10 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         String currentPowerRingtonePath =
                 Global.getString(getContentResolver(), Global.POWER_NOTIFICATIONS_RINGTONE);
 
+        mCameraSounds = (SwitchPreference) findPreference(KEY_CAMERA_SOUNDS);
+        mCameraSounds.setChecked(SystemProperties.getBoolean(PROP_CAMERA_SOUND, true));
+        mCameraSounds.setOnPreferenceChangeListener(this);
+
         // set to default notification if we don't yet have one
         if (currentPowerRingtonePath == null) {
                 currentPowerRingtonePath = System.DEFAULT_NOTIFICATION_URI.toString();
@@ -261,6 +276,19 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
         } else {
             // If we didn't handle it, let preferences handle it.
             return super.onPreferenceTreeClick(preferenceScreen, preference);
+        }
+
+        return true;
+    }
+
+    public boolean onPreferenceChange(Preference preference, Object objValue) {
+        final String key = preference.getKey();
+        if (KEY_CAMERA_SOUNDS.equals(key)) {
+            if ((Boolean) objValue) {
+                SystemProperties.set(PROP_CAMERA_SOUND, "1");
+            } else {
+                showDialogInner(DLG_CAMERA_SOUND);
+            }
         }
 
         return true;
@@ -351,6 +379,56 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements
             default:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
+        }
+    }
+
+    public static class MyAlertDialogFragment extends DialogFragment {
+
+        public static MyAlertDialogFragment newInstance(int id) {
+            MyAlertDialogFragment frag = new MyAlertDialogFragment();
+            Bundle args = new Bundle();
+            args.putInt("id", id);
+            frag.setArguments(args);
+            return frag;
+        }
+
+        OtherSoundSettings getOwner() {
+            return (OtherSoundSettings) getTargetFragment();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int id = getArguments().getInt("id");
+            switch (id) {
+                case DLG_CAMERA_SOUND:
+                    return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.attention)
+                    .setMessage(R.string.camera_sound_warning_dialog_text)
+                    .setPositiveButton(R.string.dlg_ok,
+                        new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SystemProperties.set(PROP_CAMERA_SOUND, "0");
+                        }
+                    })
+                    .setNegativeButton(R.string.dlg_cancel,
+                        new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .create();
+            }
+            throw new IllegalArgumentException("unknown id " + id);
+        }
+
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            int id = getArguments().getInt("id");
+            switch (id) {
+                case DLG_CAMERA_SOUND:
+                    getOwner().mCameraSounds.setChecked(true);
+                    break;
+            }
         }
     }
 }

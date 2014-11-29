@@ -627,4 +627,9 @@
     <string name="disable_immersive_message_title">Diable immersive messages</string>
     <string name="disable_immersive_message_summary">This will hide all immersive mode messages</string>
 
+    <!-- Camera sound -->
+    <string name="camera_sounds_title">Camera shutter sound</string>
+    <string name="camera_sounds_summary">Enable system camera shutter sound</string>
+    <string name="camera_sound_warning_dialog_text">Disabling the camera shutter sound is illegal in some areas! Please check the applicable law in your country</string>
+
 </resources>
