@@ -526,6 +526,8 @@
     <string name="status_bar_summary">Alter your status bar in many ways</string>
     <string name="status_bar_toggle_brightness_title">Brightness control</string>
     <string name="status_bar_toggle_brightness_summary">Adjust brightness by sliding across the status bar</string>
+    <string name="status_bar_notif_count_title">Show notification count</string>
+    <string name="status_bar_notif_count_summary">Display the number of pending notifications</string>
 
     <!-- Quick pulldown -->
     <string name="quick_pulldown_title">Quick pulldown</string>
