@@ -80,7 +80,6 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_FONT_SIZE = "font_size";
     private static final String KEY_SCREEN_SAVER = "screensaver";
     private static final String KEY_LIFT_TO_WAKE = "lift_to_wake";
-    private static final String KEY_DOZE = "doze";
     private static final String KEY_AUTO_BRIGHTNESS = "auto_brightness";
     private static final String KEY_AUTO_ROTATE = "auto_rotate";
     private static final String KEY_VOLUME_WAKE = "pref_volume_wake";
@@ -98,16 +97,21 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
 
     private PreferenceCategory mWakeUpOptions;
 
+    private static final String KEY_DOZE_CATEGORY = "category_doze_options";
+    private static final String KEY_DOZE = "doze";
+
     private final Configuration mCurConfig = new Configuration();
 
     private ListPreference mScreenTimeoutPreference;
     private Preference mScreenSaverPreference;
     private SwitchPreference mLiftToWakePreference;
-    private SwitchPreference mDozePreference;
     private SwitchPreference mAutoBrightnessPreference;
     private SwitchPreference mVolumeWake;
     private SwitchPreference mSwapVolumeButtons;
     private SwitchPreference mWakeWhenPluggedOrUnplugged;
+
+    private PreferenceCategory mDozeCategory;
+    private SwitchPreference mDozePreference;
 
     private ContentObserver mAccelerometerRotationObserver =
             new ContentObserver(new Handler()) {
@@ -204,11 +208,13 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             removePreference(KEY_LIFT_TO_WAKE);
         }
 
+        mDozeCategory = (PreferenceCategory) findPreference(KEY_DOZE_CATEGORY);
         if (isDozeAvailable(activity)) {
+            // Doze master switch
             mDozePreference = (SwitchPreference) findPreference(KEY_DOZE);
             mDozePreference.setOnPreferenceChangeListener(this);
         } else {
-            removePreference(KEY_DOZE);
+            prefSet.removePreference(mDozeCategory);
         }
 
         mWakeUpOptions = (PreferenceCategory) findPreference(KEY_WAKEUP_CATEGORY);
