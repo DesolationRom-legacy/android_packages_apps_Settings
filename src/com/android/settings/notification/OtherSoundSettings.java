@@ -35,7 +35,6 @@ import android.os.Vibrator;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.provider.SearchIndexableResource;
 import android.provider.Settings.Global;
 import android.provider.Settings.System;
 import android.telephony.TelephonyManager;
@@ -43,14 +42,10 @@ import android.telephony.TelephonyManager;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
-import com.android.settings.search.BaseSearchIndexProvider;
-import com.android.settings.search.Indexable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+public class OtherSoundSettings extends SettingsPreferenceFragment implements
+        Preference.OnPreferenceChangeListener {
 
-public class OtherSoundSettings extends SettingsPreferenceFragment implements Indexable {
     private static final String TAG = "OtherSoundSettings";
 
     private static final int DEFAULT_ON = 1;
@@ -129,14 +124,6 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements In
         }
     };
 
-    private static final SettingPref PREF_VIBRATE_ON_TOUCH = new SettingPref(
-            TYPE_SYSTEM, KEY_VIBRATE_ON_TOUCH, System.HAPTIC_FEEDBACK_ENABLED, DEFAULT_ON) {
-        @Override
-        public boolean isApplicable(Context context) {
-            return hasHaptic(context);
-        }
-    };
-
     private static final SettingPref PREF_DOCK_AUDIO_MEDIA = new SettingPref(
             TYPE_GLOBAL, KEY_DOCK_AUDIO_MEDIA, Global.DOCK_AUDIO_MEDIA_ENABLED,
             DEFAULT_DOCK_AUDIO_MEDIA, DOCK_AUDIO_MEDIA_DISABLED, DOCK_AUDIO_MEDIA_ENABLED) {
@@ -188,7 +175,6 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements In
         PREF_DOCKING_SOUNDS,
         PREF_VOLUME_ADJUST_SOUNDS,
         PREF_TOUCH_SOUNDS,
-        PREF_VIBRATE_ON_TOUCH,
         PREF_DOCK_AUDIO_MEDIA,
         PREF_EMERGENCY_TONE,
     };
@@ -284,11 +270,6 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements In
         return context.getResources().getBoolean(R.bool.has_dock_settings);
     }
 
-    private static boolean hasHaptic(Context context) {
-        final Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        return vibrator != null && vibrator.hasVibrator();
-    }
-
     // === Callbacks ===
 
     private final class SettingsObserver extends ContentObserver {
@@ -318,29 +299,6 @@ public class OtherSoundSettings extends SettingsPreferenceFragment implements In
             }
         }
     }
-
-    // === Indexing ===
-
-    public static final BaseSearchIndexProvider SEARCH_INDEX_DATA_PROVIDER =
-            new BaseSearchIndexProvider() {
-
-        public List<SearchIndexableResource> getXmlResourcesToIndex(
-                Context context, boolean enabled) {
-            final SearchIndexableResource sir = new SearchIndexableResource(context);
-            sir.xmlResId = R.xml.other_sound_settings;
-            return Arrays.asList(sir);
-        }
-
-        public List<String> getNonIndexableKeys(Context context) {
-            final ArrayList<String> rt = new ArrayList<String>();
-            for (SettingPref pref : PREFS) {
-                if (!pref.isApplicable(context)) {
-                    rt.add(pref.getKey());
-                }
-            }
-            return rt;
-        }
-    };
 
     private void launchNotificationSoundPicker(int code, String currentPowerRingtonePath) {
         final Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);

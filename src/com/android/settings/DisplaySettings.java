@@ -16,7 +16,6 @@
 
 package com.android.settings;
 
-import android.preference.CheckBoxPreference;
 import com.android.internal.view.RotationPolicy;
 import com.android.settings.notification.DropDownPreference;
 import com.android.settings.notification.DropDownPreference.Callback;
@@ -52,12 +51,14 @@ import android.preference.PreferenceCategory;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
-import android.provider.SearchIndexableResource;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.settings.R;
 import com.android.settings.desolation.DisplayRotation;
+import com.android.internal.util.cm.ScreenType;
+import com.android.settings.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,9 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private static final String KEY_VOLUME_WAKE = "pref_volume_wake";
     private static final String KEY_PROXIMITY_WAKE = "proximity_on_wake";
     private static final String KEY_DISPLAY_ROTATION = "display_rotation";
+    private static final String KEY_SWAP_VOLUME_BUTTONS = "swap_volume_buttons";
     private static final String KEY_WAKE_WHEN_PLUGGED_OR_UNPLUGGED = "wake_when_plugged_or_unplugged";
+    private static final String KEY_WAKEUP_CATEGORY = "category_wakeup_options";
 
     private static final int DLG_GLOBAL_CHANGE_WARNING = 1;
 
@@ -96,6 +99,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
     private SwitchPreference mDozePreference;
     private SwitchPreference mAutoBrightnessPreference;
     private SwitchPreference mVolumeWake;
+    private SwitchPreference mSwapVolumeButtons;
     private SwitchPreference mWakeWhenPluggedOrUnplugged;
 
     private ContentObserver mAccelerometerRotationObserver =
@@ -165,6 +169,8 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             removePreference(KEY_DOZE);
         }
 
+        mWakeUpOptions = (PreferenceCategory) findPreference(KEY_WAKEUP_CATEGORY);
+
         mVolumeWake = (SwitchPreference) findPreference(KEY_VOLUME_WAKE);
         if (mVolumeWake != null) {
             if (!getResources().getBoolean(R.bool.config_show_volumeRockerWake)) {
@@ -185,6 +191,17 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                 mWakeUpOptions.removePreference(proximityWake);
                         Settings.System.putInt(getContentResolver(),
                                 Settings.System.PROXIMITY_ON_WAKE, 1);
+            }
+        }
+
+        mSwapVolumeButtons = (SwitchPreference) findPreference(KEY_SWAP_VOLUME_BUTTONS);
+        if (mSwapVolumeButtons != null) {
+            if (!getResources().getBoolean(R.bool.config_show_volumeRockerWake)) {
+                mWakeUpOptions.removePreference(mSwapVolumeButtons);
+            } else {
+                mSwapVolumeButtons.setChecked(Settings.System.getInt(resolver,
+                        Settings.System.SWAP_VOLUME_KEYS_ON_ROTATION, 0) == 1);
+                mSwapVolumeButtons.setOnPreferenceChangeListener(this);
             }
         }
 
@@ -445,6 +462,11 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
                     Settings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED,
                     mWakeWhenPluggedOrUnplugged.isChecked() ? 1 : 0);
             return true;
+        } else if (preference == mSwapVolumeButtons) {
+            int value = mSwapVolumeButtons.isChecked()
+                    ? (ScreenType.isTablet(getActivity()) ? 2 : 1) : 0;
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.SWAP_VOLUME_KEYS_ON_ROTATION, value);
         }
 
         return super.onPreferenceTreeClick(preferenceScreen, preference);
@@ -498,39 +520,4 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
         return false;
     }
-
-    public static final Indexable.SearchIndexProvider SEARCH_INDEX_DATA_PROVIDER =
-            new BaseSearchIndexProvider() {
-                @Override
-                public List<SearchIndexableResource> getXmlResourcesToIndex(Context context,
-                        boolean enabled) {
-                    ArrayList<SearchIndexableResource> result =
-                            new ArrayList<SearchIndexableResource>();
-
-                    SearchIndexableResource sir = new SearchIndexableResource(context);
-                    sir.xmlResId = R.xml.display_settings;
-                    result.add(sir);
-
-                    return result;
-                }
-
-                @Override
-                public List<String> getNonIndexableKeys(Context context) {
-                    ArrayList<String> result = new ArrayList<String>();
-                    if (!context.getResources().getBoolean(
-                            com.android.internal.R.bool.config_dreamsSupported)) {
-                        result.add(KEY_SCREEN_SAVER);
-                    }
-                    if (!isAutomaticBrightnessAvailable(context.getResources())) {
-                        result.add(KEY_AUTO_BRIGHTNESS);
-                    }
-                    if (!isLiftToWakeAvailable(context)) {
-                        result.add(KEY_LIFT_TO_WAKE);
-                    }
-                    if (!isDozeAvailable(context)) {
-                        result.add(KEY_DOZE);
-                    }
-                    return result;
-                }
-            };
 }

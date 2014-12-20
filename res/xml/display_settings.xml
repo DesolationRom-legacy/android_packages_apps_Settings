@@ -109,6 +109,12 @@
                 android:defaultValue="true" />
 
             <SwitchPreference
+                android:key="swap_volume_buttons"
+                android:title="@string/swap_volume_buttons_title"
+                android:summary="@string/swap_volume_buttons_summary"
+                android:defaultValue="false" />
+
+            <SwitchPreference
                 android:key="wake_when_plugged_or_unplugged"
                 android:title="@string/wake_when_plugged_or_unplugged_title"
                 android:summary="@string/wake_when_plugged_or_unplugged_summary"

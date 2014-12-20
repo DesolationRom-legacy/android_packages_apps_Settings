@@ -132,6 +132,8 @@ public final class Utils {
     private static final int SECONDS_PER_HOUR = 60 * 60;
     private static final int SECONDS_PER_DAY = 24 * 60 * 60;
 
+    public static final int KEY_MASK_VOLUME = 0x40;
+
     /**
      * Finds a matching activity for a preference's intent. If a matching
      * activity is not found, it will remove the preference.
@@ -552,6 +554,13 @@ public final class Utils {
         } finally {
             profile.close();
         }
+    }
+
+    /* returns whether the device has volume rocker or not. */
+    public static boolean hasVolumeRocker(Context context) {
+        final int deviceKeys = context.getResources().getInteger(
+                com.android.internal.R.integer.config_deviceHardwareKeys);
+        return (deviceKeys & KEY_MASK_VOLUME) != 0;
     }
 
     /** Not global warming, it's global change warning. */
