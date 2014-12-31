@@ -31,6 +31,12 @@
         android:entryValues="@array/smart_pulldown_values"
         android:persistent="false" />
 
+    <com.android.settings.desolation.SystemSettingSwitchPreference
+        android:key="quick_settings_collapse_panel"
+        android:title="@string/quick_settings_collapse_title"
+        android:summary="@string/quick_settings_collapse_summary"
+        android:defaultValue="false"/>
+
     <PreferenceCategory
         android:title="@string/qs_category_title">
 
