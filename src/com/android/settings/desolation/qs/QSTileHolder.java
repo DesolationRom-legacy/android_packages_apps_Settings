@@ -113,6 +113,10 @@ public class QSTileHolder {
                 resourceName = "ic_qs_lte_on";
                 stringId = R.string.qs_tile_lte;
                 break;
+            case QSConstants.TILE_SCREENSHOT:
+                resourceName = "ic_qs_screenshot";
+                stringId = R.string.qs_screenshot_tile;
+                break;
             case QSConstants.TILE_NFC:
                 resourceName = "ic_qs_nfc_on";
                 stringId = R.string.qs_tile_nfc;

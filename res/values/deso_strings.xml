@@ -436,6 +436,7 @@
     <string name="qs_main_tiles_summary_off">Three tiles on each row</string>
     <string name="qs_advanced_location_title">Advanced location settings</string>
     <string name="qs_advanced_location_summary">Enable advanced settings for location in Quick Settings</string>
+    <string name="qs_screenshot_tile">Screenshot</string>
 
     <!-- Network traffic -->
     <string name="network_traffic_title">Network traffic</string>
