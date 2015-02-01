@@ -107,5 +107,6 @@
     <!-- Color picker -->
     <dimen name="color_swatch_size">16dp</dimen>
     <dimen name="color_swatch_stroke_width">4dp</dimen>
+    <color name="qs_tile_default_background_color">@android:color/transparent</color>
 
 </resources>
