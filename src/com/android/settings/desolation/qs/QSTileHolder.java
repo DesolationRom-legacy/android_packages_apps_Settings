@@ -121,6 +121,10 @@ public class QSTileHolder {
                 resourceName = "ic_qs_sync_on";
                 stringId = R.string.qs_sync_tile;
                 break;
+            case QSConstants.TILE_POWERMENU:
+                resourceName = "ic_qs_powermenu";
+                stringId = R.string.qs_tile_powermenu;
+                break;
             case QSConstants.TILE_NFC:
                 resourceName = "ic_qs_nfc_on";
                 stringId = R.string.qs_tile_nfc;
