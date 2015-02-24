@@ -52,11 +52,13 @@ public class StatusBar extends SettingsPreferenceFragment
     private static final String STATUS_BAR_CARRIER = "status_bar_carrier";
     private static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
     private static final String STATUS_BAR_CARRIER_COLOR = "status_bar_carrier_color";
+    private static final String KEY_STATUS_BAR_NETWORK_ARROWS= "status_bar_show_network_activity";
 
     static final int DEFAULT_STATUS_CARRIER_COLOR = 0xffffffff;
 
     private SwitchPreference mStatusBarCarrier;
     private PreferenceScreen mCustomCarrierLabel;
+    private SwitchPreference mNetworkArrows;
 
     private String mCustomCarrierLabelText;
     private ColorPickerPreference mCarrierColorPicker;
@@ -87,6 +89,15 @@ public class StatusBar extends SettingsPreferenceFragment
         hexColor = String.format("#%08x", (0xffffffff & intColor));
         mCarrierColorPicker.setSummary(hexColor);
         mCarrierColorPicker.setNewPreviewColor(intColor);
+
+        // Network arrows
+        mNetworkArrows = (SwitchPreference) prefSet.findPreference(KEY_STATUS_BAR_NETWORK_ARROWS);
+        mNetworkArrows.setChecked(Settings.System.getInt(getActivity().getContentResolver(),
+            Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY, 1) == 1);
+        mNetworkArrows.setOnPreferenceChangeListener(this);
+        int networkArrows = Settings.System.getInt(getContentResolver(),
+                Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY, 1);
+        updateNetworkArrowsSummary(networkArrows);
 
         if (TelephonyManager.getDefault().isMultiSimEnabled()
                 || Utils.isWifiOnly(getActivity())) {
@@ -123,8 +134,16 @@ public class StatusBar extends SettingsPreferenceFragment
             boolean value = (Boolean) newValue;
             Settings.System.putInt(resolver, Settings.System.STATUS_BAR_CARRIER, value ? 1 : 0);
             return true;
-         }
-         return false;
+        } else if (preference == mNetworkArrows) {
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY,
+                    (Boolean) newValue ? 1 : 0);
+            int networkArrows = Settings.System.getInt(getContentResolver(),
+                    Settings.System.STATUS_BAR_SHOW_NETWORK_ACTIVITY, 1);
+            updateNetworkArrowsSummary(networkArrows);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -161,5 +180,12 @@ public class StatusBar extends SettingsPreferenceFragment
             alert.show();
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
+    }
+
+    private void updateNetworkArrowsSummary(int value) {
+        String summary = value != 0
+                ? getResources().getString(R.string.enabled)
+                : getResources().getString(R.string.disabled);
+        mNetworkArrows.setSummary(summary);
     }
 }

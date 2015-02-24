@@ -19,6 +19,8 @@
     <string name="ok">OK</string>
     <string name="add">Add</string>
     <string name="reset">Reset</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
     <string name="attention">Attention</string>
     <string name="colors_title">Colors</string>
     <string name="default_string">Default</string>
@@ -599,5 +601,8 @@
     <string name="custom_carrier_label_explain">Please enter a new label. Leave blank to revert to stock label.</string>
     <string name="custom_carrier_label_notset">Custom label currently not set</string>
     <string name="status_bar_carrier_color">Carrier label color</string>
+
+    <!-- Hide network activity arrows -->
+    <string name="status_bar_show_network_activity_title">Network activity arrows</string>
 
 </resources>
