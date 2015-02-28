@@ -30,8 +30,8 @@ import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.desolation.qs.QSTiles;
 
-public class NotificationDrawerSettings extends SettingsPreferenceFragment implements Indexable,
-        Preference.OnPreferenceChangeListener {
+public class NotificationDrawer extends SettingsPreferenceFragment
+        implements Preference.OnPreferenceChangeListener {
 
     private static final String QUICK_PULLDOWN = "quick_pulldown";
     private static final String PREF_SMART_PULLDOWN = "smart_pulldown";
