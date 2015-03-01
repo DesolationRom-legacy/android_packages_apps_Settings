@@ -964,4 +964,6 @@
     <string name="nfc_polling_mode_screen_locked">Screen on, locked</string>
     <string name="nfc_polling_mode_screen_unlocked">Screen on, unlocked (default)</string>
 
+    <string name="status_bar_show_clock_second_title">Clock seconds</string>
+
 </resources>
