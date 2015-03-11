@@ -18,4 +18,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/lock_screen_title">
 
+    <PreferenceScreen
+        android:key="lock_weather"
+        android:title="@string/lock_weather_title"
+        android:summary="@string/lock_weather_summary"
+        android:fragment="com.android.settings.desolation.LockWeather" />
+
 </PreferenceScreen>
