@@ -506,6 +506,9 @@ public class NotificationSettings extends SettingsPreferenceFragment implements 
 
             if (mNotificationPreference != null) {
                 mNotificationPreference.setEnabled(!enabled);
+                if (enabled) {
+                    updateEffectsSuppressor();
+                }
             }
         }
     }
