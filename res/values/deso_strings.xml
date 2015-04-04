@@ -474,6 +474,8 @@
     <string name="recent_apps_location_bottom_right">Bottom right</string>
     <string name="recent_apps_location_bottom_left">Bottom left</string>
     <string name="recent_apps_location_bottom_center">Bottom center</string>
+    <string name="recents_show_membar_title">Memory bar</string>
+    <string name="recents_show_membar_summary">Show a bar with the device\'s available memory</string>
 
     <!-- Development shortcut -->
     <string name="development_shortcut_title">Development shortcut</string>
