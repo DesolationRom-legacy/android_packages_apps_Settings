@@ -966,4 +966,8 @@
 
     <string name="status_bar_show_clock_second_title">Clock seconds</string>
 
+    <!-- Statusbar Desolation logo -->
+    <string name="status_bar_bliss_logo_title">Desolation logo</string>
+    <string name="status_bar_bliss_logo_summary">Enable to show Desolation logo on the left side of statusbar</string>
+
 </resources>
