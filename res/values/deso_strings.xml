@@ -518,4 +518,7 @@
     <string name="screenshot_sound_title">Screenshot sound</string>
     <string name="screenshot_sound_summary">Plays sound effect when screenshot is taken</string>
 
+    <!-- No SIM number -->
+    <string name="sim_no_number_set">No number assigned</string>
+
 </resources>
