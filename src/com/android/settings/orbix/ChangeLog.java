@@ -21,6 +21,23 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.text.Html;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.AlignmentSpan;
+import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
+import android.text.style.ParagraphStyle;
+import android.text.style.QuoteSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
+import android.text.style.SubscriptSpan;
+import android.text.style.SuperscriptSpan;
+import android.text.style.TextAppearanceSpan;
+import android.text.style.TypefaceSpan;
+import android.text.style.URLSpan;
+import android.text.style.UnderlineSpan;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -61,7 +78,7 @@ public class ChangeLog extends Fragment {
         }
 
         final TextView textView = new TextView(getActivity());
-        textView.setText(text);
+        textView.setText(Html.fromHtml(text));
 
         final ScrollView scrollView = new ScrollView(getActivity());
         scrollView.addView(textView);
