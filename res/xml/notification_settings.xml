@@ -103,21 +103,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="panel_time_out"
-        android:title="@string/category_panel_time_out"
-        settings:advanced="true">
-
-        <!-- Volume panel timeout -->
-        <ListPreference
-            android:key="volume_panel_time_out"
-            android:title="@string/volume_panel_time_out_title"
-            android:entries="@array/volume_panel_time_out_entries"
-            android:entryValues="@array/volume_panel_time_out_values"
-            android:persistent="false" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
         android:key="notification"
         android:title="@string/notification_section_header" >
 
@@ -146,6 +131,13 @@
                 android:persistent="false"
                 android:fragment="com.android.settings.notification.NotificationAccessSettings" />
 
+        <!-- Volume panel timeout -->
+        <ListPreference
+            android:key="volume_panel_time_out"
+            android:title="@string/volume_panel_time_out_title"
+            android:entries="@array/volume_panel_time_out_entries"
+            android:entryValues="@array/volume_panel_time_out_values"
+            android:persistent="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>
