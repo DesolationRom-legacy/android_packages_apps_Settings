@@ -38,6 +38,12 @@
         android:fragment="com.android.settings.desolation.HeadsUp" />
 
     <PreferenceScreen
+        android:key="lock_screen"
+        android:title="@string/lock_screen_title"
+        android:summary="@string/lock_screen_summary"
+        android:fragment="com.android.settings.desolation.LockScreen" />
+
+    <PreferenceScreen
         android:key="network_traffic"
         android:title="@string/network_traffic_title"
         android:summary="@string/network_traffic_summary"

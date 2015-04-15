@@ -734,4 +734,8 @@
     <string name="zen_mode_none_category">No interruptions</string>
     <string name="zen_mode_alarms">Allow alarms</string>
 
+    <!-- Lock screen -->
+    <string name="lock_screen_title">Lock screen</string>
+    <string name="lock_screen_summary">Create shortcuts and display the weather</string>
+
 </resources>
