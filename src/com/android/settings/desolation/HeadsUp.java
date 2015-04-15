@@ -202,7 +202,7 @@ public class HeadsUp extends SettingsPreferenceFragment
         final ListView list = new ListView(getActivity());
         list.setAdapter(mPackageAdapter);
 
-        builder.setTitle(R.string.profile_choose_app);
+        builder.setTitle(R.string.dlg_choose_app);
         builder.setView(list);
         dialog = builder.create();
 

@@ -466,7 +466,7 @@ public class NotificationLightSettings extends SettingsPreferenceFragment implem
                 final ListView list = new ListView(getActivity());
                 list.setAdapter(mPackageAdapter);
 
-                builder.setTitle(R.string.choose_app);
+                builder.setTitle(R.string.dlg_choose_app);
                 builder.setView(list);
                 dialog = builder.create();
 

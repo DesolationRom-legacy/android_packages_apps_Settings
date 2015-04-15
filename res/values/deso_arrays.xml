@@ -13,10 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <resources>
 
-    <!-- Arrays for root access capability -->
+    <!-- Root access -->
     <string-array name="root_access_entries">
         <item>@string/root_access_none</item>
         <item>@string/root_access_apps</item>
@@ -31,7 +30,7 @@
         <item>3</item>
     </string-array>
 
-    <!-- Phone blacklist management -->
+    <!-- Blacklist management -->
     <string-array name="blacklist_policy_unknown_entries" translatable="false">
         <item>@string/blacklist_policy_block_calls</item>
         <item>@string/blacklist_policy_block_messages</item>
@@ -50,7 +49,7 @@
         <item>1</item>
     </string-array>
 
-    <!-- Values for the notification light pulse spinners -->
+    <!-- Notification lights -->
     <string-array name="notification_pulse_length_entries" translatable="false">
         <item>@string/pulse_length_always_on</item>
         <item>@string/pulse_length_very_short</item>
@@ -85,7 +84,7 @@
         <item>5000</item>
     </string-array>
 
-    <!--- Sms security limit -->
+    <!--- SMS security limit -->
     <string-array name="sms_security_check_limit_entries" translatable="false">
         <item>@string/sms_security_check_limit_default</item>
         <item>100</item>
@@ -479,7 +478,7 @@
         <item>300000</item>
     </string-array>
 
-    <!-- Doze pulse (ambient display) options -->
+    <!-- Ambient display -->
     <string-array name="doze_pulse_duration_in_entries" translatable="false">
         <item>@string/twohundred_ms</item>
         <item>@string/fivehundred_ms</item>

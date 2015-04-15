@@ -20,7 +20,7 @@
 
     <PreferenceCategory
         android:key="weather_cat_forecast"
-        android:title="@string/forecast_title">
+        android:title="@string/lock_forecast_title">
 
         <SwitchPreference
             android:key="weather_show_weather"

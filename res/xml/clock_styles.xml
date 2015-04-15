@@ -71,7 +71,7 @@
 
     <PreferenceCategory
         android:key="clock_date_format_options"
-        android:title="@string/clock_date_format">
+        android:title="@string/clock_date_style">
 
         <ListPreference
             android:key="clock_date_display"
