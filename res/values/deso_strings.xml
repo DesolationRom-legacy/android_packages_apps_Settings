@@ -326,7 +326,7 @@
     <string name="dont_show">Don\'t show</string>
     <string name="clock_date_display">Date</string>
     <string name="clock_date_display_summary">Display custom date before the clock</string>
-    <string name="clock_date_style">Date style</string>
+    <string name="clock_time_style">Time style</string>
     <string name="clock_date_format">Date format</string>
     <string name="clock_date_string_edittext_title">Must be in DateFormat eg. MM/dd/yy</string>
     <string name="clock_date_string_edittext_summary">Enter string</string>
@@ -737,5 +737,15 @@
     <!-- Lock screen -->
     <string name="lock_screen_title">Lock screen</string>
     <string name="lock_screen_summary">Create shortcuts and display the weather</string>
+
+    <!-- Lock clock -->
+    <string name="lock_clock_title">Clock widget</string>
+    <string name="lock_clock_summary">View or change how the widget layout</string>
+    <string name="lock_clock_clock_section_title">Clock and alarm</string>
+    <string name="lock_clock_clock_section_summary">Customize the clock and alarm format</string>
+    <string name="lock_clock_weather_section_title">Weather panel</string>
+    <string name="lock_clock_weather_section_summary">Change the current weather panel display</string>
+    <string name="lock_clock_calendar_section_title">Calendar events</string>
+    <string name="lock_clock_calendar_section_summary">View your calendar event notifications</string>
 
 </resources>
