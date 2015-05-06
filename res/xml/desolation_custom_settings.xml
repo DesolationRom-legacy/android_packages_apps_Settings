@@ -96,4 +96,11 @@
         android:icon="@drawable/ic_sysbar_quicksettings"
         android:fragment="com.android.settings.desolation.StatusBar" />
 
+    <PreferenceScreen
+        android:key="wakelock_blocker"
+        android:title="@string/wakelock_blocker_title"
+        android:summary="@string/wakelock_blocker_summary"
+        android:icon="@drawable/ic_menu_save"
+        android:fragment="com.android.settings.desolation.WakeLockBlocker" />
+
 </PreferenceScreen>
