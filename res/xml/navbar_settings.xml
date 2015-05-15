@@ -22,6 +22,11 @@
                 android:title="@string/navbar_enable_bar"
                 android:summary="@string/navbar_enable_bar_summary" />
 
+        <com.android.settings.desolation.SecureSettingSwitchPreference
+                android:key="search_panel_enabled"
+                android:title="@string/navigation_ring_enable_title"
+                android:defaultValue="true"/>
+
         <PreferenceCategory
                 android:key="navbar_cat"
                 android:title="@string/navbar_cat" >
