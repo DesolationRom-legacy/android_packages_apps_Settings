@@ -612,8 +612,10 @@ public class DataUsageSummary extends HighlightingFragment implements Indexable 
         mDataEnabledView = null;
         mDisableAtLimitView = null;
 
-        mUidDetailProvider.clearCache();
-        mUidDetailProvider = null;
+        if (mUidDetailProvider != null) {
+            mUidDetailProvider.clearCache();
+            mUidDetailProvider = null;
+        }
 
         TrafficStats.closeQuietly(mStatsSession);
 
