@@ -27,6 +27,12 @@
         android:fragment="com.android.settings.desolation.BatteryStyles" />
 
     <PreferenceScreen
+        android:key="boot_animation_styles"
+        android:title="@string/enable_bootanimation_title"
+        android:summary="@string/enable_bootanimation_styles_summary"
+        android:fragment="com.android.settings.desolation.BootAnimation" />
+
+    <PreferenceScreen
         android:key="clock_styles"
         android:title="@string/clock_styles_title"
         android:summary="@string/clock_styles_summary"
