@@ -72,11 +72,7 @@ public class BootAnimation extends SettingsPreferenceFragment {
     }
     
     private void writeUseBootAnimation() {
-		if (mBootAnimDisable.isChecked() == true){
-			SystemProperties.set( "persist.sys.deso.bootanim", "0");
-		} else { 
-			SystemProperties.set( "persist.sys.deso.bootanim", "1");
-		}
+		 SystemProperties.set( "persist.sys.deso.bootanim",  mBootAnimDisable.isChecked() ?  "1" : "0" );
     }
 
     @Override
