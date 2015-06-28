@@ -27,19 +27,21 @@ import android.preference.SwitchPreference;
 import android.provider.Settings;
 
 import com.android.settings.R;
+import com.android.settings.util.Helpers;
+import com.android.settings.util.CMDProcessor;
 import com.android.settings.SettingsPreferenceFragment;
 
 public class BootAnimation extends SettingsPreferenceFragment {
-    private static final String TAG = "BootAnimation";
+    private static final String TAG = "DesoCore BootAnimations";
 
     public static final String USE_BOOTANIMATION_KEY = "enable_bootanimation";
-
+    
     private SwitchPreference mBootAnimDisable;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         addPreferencesFromResource(R.xml.boot_animation_settings);
 
         mBootAnimDisable = (SwitchPreference) findPreference(USE_BOOTANIMATION_KEY);
@@ -72,7 +74,11 @@ public class BootAnimation extends SettingsPreferenceFragment {
     }
     
     private void writeUseBootAnimation() {
-		 SystemProperties.set( "persist.sys.deso.bootanim",  mBootAnimDisable.isChecked() ?  "1" : "0" );
+		SystemProperties.set( "persist.sys.deso.bootanim",  mBootAnimDisable.isChecked() ?  "1" : "0" );
+		if (Helpers.checkSu() == false){
+			CMDProcessor.canSU();
+		}
+		CMDProcessor.runSuCommand("sh /system/bin/bootanitoggle").getStdout();
     }
 
     @Override
