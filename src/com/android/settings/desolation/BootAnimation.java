@@ -29,6 +29,7 @@ import android.provider.Settings;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 
 import com.android.settings.R;
@@ -41,21 +42,20 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 
     public static final String USE_BOOTANIMATION_KEY = "enable_bootanimation";
     public static final String SET_BOOTANIMATION_KEY = "select_bootanimation";
-    /*-- For future use
-    public String[] mSDCardBootAnims = zipFileFilter("/sdcard/desobootanimations", ".zip");
-    --*/
-    
     private SwitchPreference mBootAnimDisable;
     private ListPreference mBootAnimSelect;
+    
+	private FilenameFilter mZipFilter = new FilenameFilter() {
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith(".zip");
+		}
+	};
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         addPreferencesFromResource(R.xml.boot_animation_settings);
-        /*-- For future use
-		//System.out.println(Arrays.toString(mSDCardBootAnims)); //Used in personal testing
-		--*/
         mBootAnimDisable = (SwitchPreference) findPreference(USE_BOOTANIMATION_KEY);
         mBootAnimSelect = (ListPreference) findPreference(SET_BOOTANIMATION_KEY);
         updateState();
@@ -96,8 +96,19 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     }
  
     private void updateBootAnimSelect(){
-		String[] entries = {"Stock", "8-bit Arcade by Scar45"};
-		String[] values = {"/vendor/bootanimations/stockbootani.zip", "/vendor/bootanimations/8bitarcade.zip"};
+		String[] entries = {
+		//If more are added please modify here -- See vendor
+		"Stock", // 1
+		"8-bit Arcade by Scar45", // 2
+		zipFileFilter("/sdcard/desobootanimations")// 3 ---EDIT ABOVE THIS LINE--- Available file(s) from Storage
+		};
+		String[] values = {
+		// & remember to add their matching path -- See vendor
+		"/vendor/bootanimations/stockbootani.zip", // 1
+		"/vendor/bootanimations/8bitarcade.zip", // 2
+		zipFileFilter("/sdcard/desobootanimations")// 3 ---EDIT ABOVE THIS LINE--- Available file(s) from Storage
+		};
+		System.out.println(Arrays.toString(entries));
 		mBootAnimSelect.setEntries(entries);
 		mBootAnimSelect.setEntryValues(values);
 		SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip");
@@ -126,14 +137,13 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private void removePreference(Preference preference) {
         getPreferenceScreen().removePreference(preference);
     }
-    
-    /*-- For future use    
-    private String[] zipFileFilter(String dir, String filter){
-		File files = (new File(dir)).listFiles(filter);
-		String[] ret = files.list();
+
+    private String zipFileFilter(String path){
+		File f = new File(path);
+		File[] files = f.listFiles(mZipFilter);
+		String ret = Arrays.toString(files).replace("[", "").replace("]", "").trim();
 		return ret;
 	}
-    --*/
 
     @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
