@@ -642,5 +642,6 @@
     <string name="enable_bootanimation_title">Boot Animations</string>
     <string name="enable_bootanimation_summary">Enable or disable boot animation</string>
     <string name="enable_bootanimation_styles_summary">Alter boot animation settings</string>
+    <string name="bootanimation_file_title">Boot Animation Selection</string>
 
 </resources>

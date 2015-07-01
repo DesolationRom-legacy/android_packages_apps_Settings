@@ -23,5 +23,9 @@
         android:title="@string/enable_bootanimation_title"
         android:summary="@string/enable_bootanimation_summary"
         android:defaultValue="true"/>
+		
+	<ListPreference
+				android:key="select_bootanimation"
+				android:title="@string/bootanimation_file_title" />
 
 </PreferenceScreen>
