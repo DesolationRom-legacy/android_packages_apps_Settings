@@ -340,21 +340,6 @@
         <item>5</item>
     </string-array>
 
-    <!-- Kill app long-press back timeout -->
-    <string-array name="kill_app_longpress_timeout_entries">
-        <item>@string/timeout_2000</item>
-        <item>@string/timeout_1500</item>
-        <item>@string/timeout_1000</item>
-        <item>@string/timeout_500</item>
-    </string-array>
-
-    <string-array name="kill_app_longpress_timeout_values" translatable="false">
-        <item>2000</item>
-        <item>1500</item>
-        <item>1000</item>
-        <item>500</item>
-    </string-array>
-
     <!-- Volume panel timeout -->
     <string-array name="volume_panel_time_out_entries">
         <item>@string/volume_panel_time_out_1sec</item>
@@ -707,5 +692,4 @@
         <item>**wake_device**</item>
         <item>**null**</item>
     </string-array>
-
 </resources>
