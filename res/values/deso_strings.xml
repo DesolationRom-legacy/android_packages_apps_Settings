@@ -70,6 +70,7 @@
     <string name="root_access_none">Disabled</string>
     <string name="root_access_apps">Apps only</string>
     <string name="root_access_adb">ADB only</string>
+    <string name="root_access_all">Apps and ADB</string>
 
     <!-- Partition info -->
     <string name="partition_info_title">Partition info</string>
