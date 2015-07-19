@@ -36,6 +36,11 @@
                 <extra android:name="fragment" android:value="com.android.settings.slim.fragments.NavbarButtonFragment" />
             </PreferenceScreen>
 
+           <PreferenceScreen
+                android:key="nav_bar_button_style"
+                android:fragment="com.android.settings.desolation.NavBarButtonStyle"
+                android:title="@string/nav_bar_button_style" />
+
             <PreferenceScreen
                 android:key="navbar_style_dimen_settings"
                 android:fragment="com.android.settings.desolation.NavbarStyleDimenSettings"
