@@ -205,7 +205,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         }
 
         mDozeFragement = (PreferenceScreen) findPreference(KEY_DOZE_FRAGMENT);
-        if (!isDozeAvailable(activity)) {
+        if (!getResources().getBoolean(com.android.internal.R.bool.config_doze_enabled_by_default)) {
             getPreferenceScreen().removePreference(mDozeFragement);
         }
 
@@ -460,7 +460,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
         if (mLiftToWakePreference != null) {
             int value = Settings.Secure.getInt(getContentResolver(), WAKE_GESTURE_ENABLED, 0);
             mLiftToWakePreference.setChecked(value != 0);
-        }
+        }        
     }
 
     private void updateScreenSaverSummary() {
