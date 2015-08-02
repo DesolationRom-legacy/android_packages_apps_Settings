@@ -50,18 +50,34 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private SwitchPreference mBootAnimDisable;
     private ListPreference mBootAnimSelect;
     private String mStoragePath;
-    
+    private String mDownloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-	if (IOHelper.runStorageCheck("/sdcard/desobootanimations") == 1){
-		mStoragePath = "/sdcard/desobootanimations";
-	} else {
-		mStoragePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-	}
         addPreferencesFromResource(R.xml.boot_animation_settings);
         mBootAnimDisable = (SwitchPreference) findPreference(USE_BOOTANIMATION_KEY);
         mBootAnimSelect = (ListPreference) findPreference(SET_BOOTANIMATION_KEY);
+        Log.i(TAG, "BootAnimations are set to "+(mBootAnimDisable.isChecked() ? true:false));
+        File bootanimations = new File(Environment.getExternalStorageDirectory(), "deso/bootanimations/");
+        mStoragePath = bootanimations.getAbsolutePath();
+        if (Helpers.checkSu() == false){
+		CMDProcessor.canSU();
+        }
+
+	File bootaniBackup = new File("/system/media/bootanimation.backup");
+	if (bootaniBackup.exists() != true){
+      		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.zip /system/media/bootanimation.backup && sysro").getStdout();
+  	}
+    	File vendorProp = new File("/vendor/build.prop");
+    	if (vendorProp.exists() != true){
+      		CMDProcessor.runSuCommand("sysrw && touch /vendor/build.prop && chmod 0644 /vendor/build.prop && sysro").getStdout();
+	}
+        if (bootanimations.mkdirs()) {
+		Log.i(TAG, "Path Created: "+mStoragePath);
+        } else {
+		Log.i(TAG, "Path already exists: "+mStoragePath);
+        }
     }
 
     @Override
@@ -80,95 +96,102 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
         updateUseBootAnimation();
         updateBootAnimSelect();
     }
-    
+
     private void updateSwitchPreference(SwitchPreference switchPreference, boolean value) {
         switchPreference.setChecked(value);
     }
 
     private void updateUseBootAnimation() {
-		updateSwitchPreference( mBootAnimDisable, SystemProperties.getBoolean("persist.sys.deso.bootanim", true));
+	updateSwitchPreference( mBootAnimDisable, SystemProperties.getBoolean("persist.sys.deso.bootanim", true));
     }
- 
+
     private void updateBootAnimSelect(){
 	List<CharSequence> storagelist = new ArrayList<CharSequence>();
 	List<CharSequence> storagevalues = new ArrayList<CharSequence>();
 	/*--- Available zips from Storage
-	 * --Static path set to /sdcard/desobootanimations */
+	 * --Static path set to External storage deso/bootanimations */
 	// ---EDIT BELOW THIS LINE FOR STATIC ENTRIES
 	CharSequence[] staticentries = {
 	//If more are added please modify here -- See vendor
-	"Stock", // 1
-	"8-bit Arcade by Scar45" // 2
+		"Stock"
 	};
 	CharSequence[] staticvalues = {
 	// & remember to add their matching path -- See vendor
-	"/vendor/bootanimations/stockbootani.zip", // 1
-	"/vendor/bootanimations/8bitarcade.zip" // 2
+		"/system/media/bootanimation.zip"
 	};// 3 ---EDIT ABOVE THIS LINE FOR STATIC ENTRIES
-	switch(IOHelper.runStorageCheck(mStoragePath)){
-		case 0:
-			mBootAnimSelect.setEntries(staticentries);
-			mBootAnimSelect.setEntryValues(staticvalues);
-		case 1:
-			for (CharSequence a: staticentries){
-				storagelist.add(a);
-			}
-			for (CharSequence c: staticvalues){
-				storagevalues.add(c);
-			}
-			CharSequence[] storageentries = IOHelper.zipFileFilter(mStoragePath);
-			for (CharSequence b: storageentries){
-				storagelist.add(b);
-			}
-			for (CharSequence d: storageentries){
-				storagevalues.add(d);
-			}
-			CharSequence[] entries = storagelist.toArray(staticentries);
-			CharSequence[] values = storagevalues.toArray(staticvalues);
-			mBootAnimSelect.setEntries(entries);
-			mBootAnimSelect.setEntryValues(values);
+	for (CharSequence a: staticentries){
+		storagelist.add(a);
 	}
-        mBootAnimSelect.setValue(SystemProperties.get("persist.sys.deso.bootanimfile", "/vendor/bootanimations/stockbootani.zip"));
-        mBootAnimSelect.setOnPreferenceChangeListener(this);
-	}   
-    
-    private void writeUseBootAnimation() {
+	for (CharSequence c: staticvalues){
+		storagevalues.add(c);
+	}
+	if (IOHelper.runStorageCheck(mDownloadsPath) == 1){
+		CharSequence[] dloaddir = IOHelper.zipFileFilter(mDownloadsPath);
+		for (CharSequence b: dloaddir){
+			storagelist.add(b);
+		}
+		for (CharSequence d: dloaddir){
+			storagevalues.add(d);
+		}
+	}
+	if (IOHelper.runStorageCheck(mStoragePath) == 1){
+		CharSequence[] storageentries = IOHelper.zipFileFilter(mStoragePath);
+		for (CharSequence b: storageentries){
+			storagelist.add(b);
+		}
+		for (CharSequence d: storageentries){
+			storagevalues.add(d);
+		}
+	}
+	CharSequence[] entries = storagelist.toArray(staticentries);
+	CharSequence[] values = storagevalues.toArray(staticvalues);
+	mBootAnimSelect.setEntries(entries);
+	mBootAnimSelect.setEntryValues(values);
+	mBootAnimSelect.setValue(SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"));
+	mBootAnimSelect.setOnPreferenceChangeListener(this);
+  }
+
+  private void writeUseBootAnimation() {
 	SystemProperties.set( "persist.sys.deso.bootanim",  mBootAnimDisable.isChecked() ?  "1" : "0" );
-	if (Helpers.checkSu() == false){
-		CMDProcessor.canSU();
+	if (mBootAnimDisable.isChecked() == true) {
+		CMDProcessor.runSuCommand("sysrw && sed -i '/debug.sf.nobootanimation=/d' /vendor/build.prop && sysro").getStdout();
+		Log.i(TAG, "Enabled Boot Animations");
+	} else {
+		CMDProcessor.runSuCommand("sysrw && echo 'debug.sf.nobootanimation=1' >> /vendor/build.prop && sysro").getStdout();
+		Log.i(TAG, "Disabled Boot Animations");
 	}
-	CMDProcessor.runSuCommand("sh /system/bin/bootani toggle").getStdout();
-    }
-    
-    private void writeBootAnimSelect(Object newValue) {
+  }
+
+  private void writeBootAnimSelect(Object newValue) {
 	int index = mBootAnimSelect.findIndexOfValue((String) newValue);
+	Log.i(TAG, "Index value "+index+" set to "+(mBootAnimSelect.getEntries()[index]));
 	SystemProperties.set("persist.sys.deso.bootanimfile", String.valueOf((String) newValue));
 	mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[index]);
-	if (Helpers.checkSu() == false){
-		CMDProcessor.canSU();
+	if (index != 0){
+		CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf((String) newValue)+" /system/media/bootanimation.zip && sysro").getStdout();
+	} else { //Stock Chosen
+		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.backup /system/media/bootanimation.zip && sysro").getStdout();
 	}
-	CMDProcessor.runSuCommand("sh /system/bin/bootani writenew").getStdout();
-    }
+  }
 
-    private void removePreference(Preference preference) {
-        getPreferenceScreen().removePreference(preference);
-    }
+  private void removePreference(Preference preference) {
+	getPreferenceScreen().removePreference(preference);
+  }
 
-    @Override
-    public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
-            Preference preference) {
-        if (preference == mBootAnimDisable) {
-            writeUseBootAnimation();
-            return true;
-        }
-        return super.onPreferenceTreeClick(preferenceScreen, preference);
-    }
+  @Override
+  public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+	if (preference == mBootAnimDisable) {
+		writeUseBootAnimation();
+        	return true;
+	}
+	return super.onPreferenceTreeClick(preferenceScreen, preference);
+  }
 
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
+  public boolean onPreferenceChange(Preference preference, Object newValue) {
 	if (preference == mBootAnimSelect) {
 		writeBootAnimSelect(newValue);
-		return true;    
+		return true;
 	}
-		return false;
-    }
+	 return false;
+  }
 }
