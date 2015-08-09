@@ -16,6 +16,7 @@
 
 package com.android.settings.desolation;
 
+import android.app.util.desolation.IOHelper;
 import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Environment;
@@ -49,21 +50,11 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private SwitchPreference mBootAnimDisable;
     private ListPreference mBootAnimSelect;
     private String mStoragePath;
-    private FilenameFilter mZipFilter = new FilenameFilter() {
-		public boolean accept(File dir, String name) {
-			return name.toLowerCase().endsWith(".zip");
-		}
-    };
-    private FileFilter mDirFilter = new FileFilter() {
-		public boolean accept(File file) {
-			return file.isDirectory();
-		}
-    };
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-	if (runStorageCheck("/sdcard/desobootanimations") == 1){
+	if (IOHelper.runStorageCheck("/sdcard/desobootanimations") == 1){
 		mStoragePath = "/sdcard/desobootanimations";
 	} else {
 		mStoragePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
@@ -114,7 +105,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 	"/vendor/bootanimations/stockbootani.zip", // 1
 	"/vendor/bootanimations/8bitarcade.zip" // 2
 	};// 3 ---EDIT ABOVE THIS LINE FOR STATIC ENTRIES
-	switch(runStorageCheck(mStoragePath)){
+	switch(IOHelper.runStorageCheck(mStoragePath)){
 		case 0:
 			mBootAnimSelect.setEntries(staticentries);
 			mBootAnimSelect.setEntryValues(staticvalues);
@@ -125,7 +116,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 			for (CharSequence c: staticvalues){
 				storagevalues.add(c);
 			}
-			CharSequence[] storageentries = zipFileFilter(mStoragePath);
+			CharSequence[] storageentries = IOHelper.zipFileFilter(mStoragePath);
 			for (CharSequence b: storageentries){
 				storagelist.add(b);
 			}
@@ -161,47 +152,6 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 
     private void removePreference(Preference preference) {
         getPreferenceScreen().removePreference(preference);
-    }
-
-    public CharSequence[] zipFileFilter(String path){
-	File f = new File(path);
-	File[] g;
-	g = f.listFiles(mDirFilter);
-	List<CharSequence> ret = new ArrayList<CharSequence>();
-	for (File a: g){
-		File[] h = a.listFiles(mZipFilter);
-		for (File o: h){
-			if (o.isFile()){
-				ret.add(o.getAbsolutePath());
-				Log.i(TAG, " Found file: "+o.getAbsolutePath());
-			}
-		}
-	}
-	for (File b: g){
-		String dir = b.getAbsolutePath();
-		Log.i(TAG, " Found Path: "+dir);
-		zipFileFilter(dir);	
-		}
-		File[] n = f.listFiles(mZipFilter);
-			for (File c: n){
-				if (c.isFile()){
-					ret.add(c.getAbsolutePath());
-					Log.i(TAG, " Found file: "+c.getAbsolutePath());
-				}
-			}
-		CharSequence[] ret2 = new CharSequence[ret.size()];
-		ret2 = ret.toArray(ret2);
-		return ret2;
-	}
-
-    public int runStorageCheck(String path) {
-	File f = new File(path);
-	File[] g = f.listFiles();
-	if (g == null){
-		return 0;
-	} else {
-		return 1;
-	}			
     }
 
     @Override
