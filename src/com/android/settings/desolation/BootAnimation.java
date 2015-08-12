@@ -16,8 +16,19 @@
 
 package com.android.settings.desolation;
 
+import android.app.DownloadManager;
+import android.app.DownloadManager.Query;
+import android.app.DownloadManager.Request;
 import android.app.util.desolation.IOHelper;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.ContentObserver;
+import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -29,6 +40,7 @@ import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -50,7 +62,20 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private SwitchPreference mBootAnimDisable;
     private ListPreference mBootAnimSelect;
     private String mStoragePath;
-    private String mDownloadsPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+    private static final String mServer = "http://snuzzo.android-edge.com/Roms/deso/deso-bootanis";
+    long ref;
+    File bootanimations;
+    ConnectivityManager cManager;
+    DownloadManager dmgr;
+    DownloadManager.Request request;
+    NetworkInfo netinfo;
+    /* The following are the items which can be downloaded or are currently our prebuilt animations
+    Small explanation - mServer contains a dir which holds multiple zip files we base it off
+    the baked in stock animation's sizes (480/800/1080/1440). This then gets passed in the form of a property
+    to tell our download services which zip to request we then name it as the dir name ending in zip */ 
+    CharSequence[] staticentries = { "Stock", "8-Bit Arcade by @Scar45"	};
+    CharSequence[] staticvalues = { "/system/media/bootanimation.zip", "8bitarcade" };
+    /* any questions do not hesitate to comment or email me - Snuzzo */
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +84,12 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
         mBootAnimDisable = (SwitchPreference) findPreference(USE_BOOTANIMATION_KEY);
         mBootAnimSelect = (ListPreference) findPreference(SET_BOOTANIMATION_KEY);
         Log.i(TAG, "BootAnimations are set to "+(mBootAnimDisable.isChecked() ? true:false));
-        File bootanimations = new File(Environment.getExternalStorageDirectory(), "deso/bootanimations/");
+	cManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+	dmgr = (DownloadManager) this.getSystemService(Context.DOWNLOAD_SERVICE);
+	netinfo = cManager.getActiveNetworkInfo();
+        bootanimations = new File(Environment.getExternalStorageDirectory(), "deso/bootanimations/");
         mStoragePath = bootanimations.getAbsolutePath();
+	IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         if (Helpers.checkSu() == false){
 		CMDProcessor.canSU();
         }
@@ -78,6 +107,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
         } else {
 		Log.i(TAG, "Path already exists: "+mStoragePath);
         }
+	getActivity().getApplicationContext().registerReceiver(receiver, filter);
     }
 
     @Override
@@ -108,31 +138,11 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private void updateBootAnimSelect(){
 	List<CharSequence> storagelist = new ArrayList<CharSequence>();
 	List<CharSequence> storagevalues = new ArrayList<CharSequence>();
-	/*--- Available zips from Storage
-	 * --Static path set to External storage deso/bootanimations */
-	// ---EDIT BELOW THIS LINE FOR STATIC ENTRIES
-	CharSequence[] staticentries = {
-	//If more are added please modify here -- See vendor
-		"Stock"
-	};
-	CharSequence[] staticvalues = {
-	// & remember to add their matching path -- See vendor
-		"/system/media/bootanimation.zip"
-	};// 3 ---EDIT ABOVE THIS LINE FOR STATIC ENTRIES
 	for (CharSequence a: staticentries){
 		storagelist.add(a);
 	}
 	for (CharSequence c: staticvalues){
 		storagevalues.add(c);
-	}
-	if (IOHelper.runStorageCheck(mDownloadsPath) == 1){
-		CharSequence[] dloaddir = IOHelper.zipFileFilter(mDownloadsPath);
-		for (CharSequence b: dloaddir){
-			storagelist.add(b);
-		}
-		for (CharSequence d: dloaddir){
-			storagevalues.add(d);
-		}
 	}
 	if (IOHelper.runStorageCheck(mStoragePath) == 1){
 		CharSequence[] storageentries = IOHelper.zipFileFilter(mStoragePath);
@@ -167,15 +177,32 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 	Log.i(TAG, "Index value "+index+" set to "+(mBootAnimSelect.getEntries()[index]));
 	SystemProperties.set("persist.sys.deso.bootanimfile", String.valueOf((String) newValue));
 	mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[index]);
-	if (index != 0){
-		CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf((String) newValue)+" /system/media/bootanimation.zip && sysro").getStdout();
-	} else { //Stock Chosen
+	if (index == 0){ /*- file copy of our backup to revert baked to our baked in animation -*/
 		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.backup /system/media/bootanimation.zip && sysro").getStdout();
+	} else if (index > staticentries.length){ /*- This a user selected custom animation -*/
+		CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf((String) newValue)+" /system/media/bootanimation.zip && sysro").getStdout();
+	} else { /*- This a prebuilt downloaded zip file -*/
+		File destination = new File(mStoragePath+"/"+String.valueOf((String) newValue)+".bootani");
+		if (destination.exists()){
+			CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf(destination)+" /system/media/bootanimation.zip && sysro").getStdout();
+		} else {
+			downloadBootani(SystemProperties.get("persist.sys.deso.bootanimfile", null), mBootAnimSelect.getEntries()[index]);
+		}
 	}
   }
 
   private void removePreference(Preference preference) {
 	getPreferenceScreen().removePreference(preference);
+  }
+
+  private void downloadBootani(String bootaniname, CharSequence title) {
+	Uri uri = Uri.parse(mServer+"/"+bootaniname+"/"+SystemProperties.get("ro.product.bootanimationsize", null)+".zip");
+	File destination = new File(mStoragePath+"/"+bootaniname+".bootani");
+	request = new Request(uri)
+		.setTitle("Bootanimation: "+title)		
+		.setVisibleInDownloadsUi(true)
+		.setDestinationUri(Uri.fromFile(destination));
+	ref = dmgr.enqueue(request);
   }
 
   @Override
@@ -192,6 +219,24 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 		writeBootAnimSelect(newValue);
 		return true;
 	}
-	 return false;
+	return false;
   }
+  BroadcastReceiver receiver = new BroadcastReceiver() {
+	  @Override
+	  public void onReceive(Context context, Intent intent) {
+		long refCompleted = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+	  	if (refCompleted == ref) {
+			Query myDownloadQuery = new Query();
+			myDownloadQuery.setFilterById(ref);
+			Cursor myDownload = dmgr.query(myDownloadQuery);
+			if (myDownload.moveToFirst()) {
+				int fileNameId = myDownload.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
+				String fileUri = myDownload.getString(fileNameId);
+				String path = Uri.parse(fileUri).getPath();
+				CMDProcessor.runSuCommand("sysrw && cp "+path+" /system/media/bootanimation.zip && sysro").getStdout();
+				}
+			myDownload.close();
+			}
+		}
+  };
 }
