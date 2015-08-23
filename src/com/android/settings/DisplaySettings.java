@@ -214,7 +214,7 @@ public class DisplaySettings extends SettingsPreferenceFragment implements
             mDozePreference = (SwitchPreference) findPreference(KEY_DOZE);
             mDozePreference.setOnPreferenceChangeListener(this);
         } else {
-            prefSet.removePreference(mDozeCategory);
+            getPreferenceScreen().removePreference(mDozeCategory);
         }
 
         mWakeUpOptions = (PreferenceCategory) findPreference(KEY_WAKEUP_CATEGORY);
