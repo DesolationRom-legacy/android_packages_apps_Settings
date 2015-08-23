@@ -62,10 +62,11 @@
                 android:title="@string/lift_to_wake_title"
                 android:persistent="false" />
 
-        <PreferenceScreen
-                android:key="doze_fragment"
+        <SwitchPreference
+                android:key="doze"
                 android:title="@string/doze_title"
-                android:fragment="com.android.settings.desolation.AmbientSettings" />
+                android:summary="@string/doze_summary"
+                android:persistent="false" />
 
         <com.android.settings.FontDialogPreference
                 android:key="font_size"
