@@ -254,7 +254,7 @@
     <string name="battery_styles_text_color_title">Text</string>
 
     <!-- Clock and date -->
-    <string name="clock_styles_title">Clock and date</string>  
+    <string name="clock_styles_title">Clock and date</string>
     <string name="clock_styles_summary">Customize clock styles and date format</string>
     <string name="clock_title_enable">Alignment</string>
     <string name="clock_enabled">Enabled</string>
@@ -422,7 +422,7 @@
     <!-- Development shortcut -->
     <string name="development_shortcut_title">Development shortcut</string>
     <string name="development_shortcut_summary">Enable application management shortcuts in notification area and recent apps list</string>
-    
+
     <!-- Hardware information -->
     <string name="hardware_info">Hardware information</string>
     <string name="device_rear_camera">Rear camera</string>
@@ -587,11 +587,11 @@
     <string name="link_volume_option_title">Link ring and notification volumes</string>
     <string name="notification_volume_option_title">Notification volume</string>
     <string name="ring_notification_volume_option_tile">Ring and notification volume</string>
-    
+
     <!-- Welcome back notification -->
     <string name="welcome_back_notification_title">Welcome back</string>
     <string name="welcome_back_notification_summary">Disables welcome message on boot</string>
-    
+
     <!-- Boot animation -->
     <string name="enable_bootanimation_title">Boot animation</string>
     <string name="enable_bootanimation_summary">Enable or disable boot animation</string>
@@ -929,5 +929,13 @@
     <string name="doze_schedule_summary_off">Doze will only pulse once per notification</string>
     <string name="doze_brightness_title">Doze brightness level</string>
     <string name="doze_brightness_summary">Brightness level of doze pulse screen (% of max allowed brightness)</string>
+
+    <!-- Notification Accent Color -->
+    <string name="notif_accent_category">Notification Color Accent</string>
+    <string name="notif_accent_color_random_title">Randomize notification accent color</string>
+    <string name="notif_accent_color_random_summary">Use a random color on every new notification</string>
+    <string name="notif_accent_title">Custom notification accent color</string>
+    <string name="notif_accent_summary">Use custom color on every new notification</string>
+    <string name="notif_accent_color">Notification accent color</string>
 
 </resources>

@@ -58,4 +58,27 @@
         android:title="@string/status_bar_show_network_activity_title"
         android:defaultValue="true" />
 
+    <PreferenceCategory
+            android:title="@string/notif_accent_category">
+
+          <SwitchPreference
+              android:key="notif_accent_color_random"
+              android:title="@string/notif_accent_color_random_title"
+              android:summary="@string/notif_accent_color_random_summary"
+              android:defaultValue="true" />
+
+          <SwitchPreference
+              android:key="notif_accent_default"
+              android:title="@string/notif_accent_title"
+              android:summary="@string/notif_accent_summary"
+              android:defaultValue="false" />
+
+          <net.margaritov.preference.colorpicker.ColorPickerPreference
+              android:key="notif_accent_color"
+              android:title="@string/notif_accent_color"
+              android:defaultValue="0xff33B5E5"
+              android:dependency="notif_accent_default" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

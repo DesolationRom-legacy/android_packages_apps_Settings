@@ -54,14 +54,22 @@ public class StatusBar extends SettingsPreferenceFragment
     private static final String STATUS_BAR_CARRIER_COLOR = "status_bar_carrier_color";
     private static final String KEY_STATUS_BAR_NETWORK_ARROWS= "status_bar_show_network_activity";
 
+    private static final String NOTIF_ACCENT_COLOR = "notif_accent_color";
+    private static final String NOTIF_ACCENT_COLOR_DEFAULT = "notif_accent_default";
+    private static final String NOTIF_ACCENT_COLOR_RANDOM = "notif_accent_color_random";
+
+    static final int DEFAULT_NOTIF_ACCENT_COLOR = 0xff33B5E5;
     static final int DEFAULT_STATUS_CARRIER_COLOR = 0xffffffff;
 
     private SwitchPreference mStatusBarCarrier;
     private PreferenceScreen mCustomCarrierLabel;
     private SwitchPreference mNetworkArrows;
+    private SwitchPreference mNotifAccentColor;
+    private SwitchPreference mNotifRandomAccentColor;
 
     private String mCustomCarrierLabelText;
     private ColorPickerPreference mCarrierColorPicker;
+    private ColorPickerPreference mNotifAccentColorPicker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,12 +82,34 @@ public class StatusBar extends SettingsPreferenceFragment
 
         int intColor;
         String hexColor;
+        int intNotifColor;
+        String hexNotifColor;
 
         mStatusBarCarrier = (SwitchPreference) prefSet.findPreference(STATUS_BAR_CARRIER);
         mStatusBarCarrier.setChecked((Settings.System.getInt(
                     resolver, Settings.System.STATUS_BAR_CARRIER, 0) == 1));
         mStatusBarCarrier.setOnPreferenceChangeListener(this);
+
+        mNotifRandomAccentColor = (SwitchPreference) prefSet.findPreference(NOTIF_ACCENT_COLOR_RANDOM);
+        mNotifRandomAccentColor.setChecked((Settings.System.getInt(
+                    resolver, Settings.System.NOTIF_ACCENT_COLOR_RANDOM, 1) == 1));
+        mNotifRandomAccentColor.setOnPreferenceChangeListener(this);
+
+        mNotifAccentColor = (SwitchPreference) prefSet.findPreference(NOTIF_ACCENT_COLOR_DEFAULT);
+        mNotifAccentColor.setChecked((Settings.System.getInt(
+                    resolver, Settings.System.NOTIF_ACCENT_COLOR_DEFAULT, 0) == 1));
+        mNotifAccentColor.setOnPreferenceChangeListener(this);
+
         mCustomCarrierLabel = (PreferenceScreen) prefSet.findPreference(CUSTOM_CARRIER_LABEL);
+
+        mNotifAccentColorPicker = (ColorPickerPreference) findPreference(NOTIF_ACCENT_COLOR);
+        mNotifAccentColorPicker.setOnPreferenceChangeListener(this);
+        intNotifColor = Settings.System.getInt(getContentResolver(),
+                    Settings.System.NOTIF_ACCENT_COLOR,
+                    DEFAULT_NOTIF_ACCENT_COLOR);
+        hexNotifColor = String.format("#%08x", (0xff33B5E5 & intNotifColor));
+        mNotifAccentColorPicker.setSummary(hexNotifColor);
+        mNotifAccentColorPicker.setNewPreviewColor(intNotifColor);
 
         mCarrierColorPicker = (ColorPickerPreference) findPreference(STATUS_BAR_CARRIER_COLOR);
         mCarrierColorPicker.setOnPreferenceChangeListener(this);
@@ -122,13 +152,29 @@ public class StatusBar extends SettingsPreferenceFragment
 
     public boolean onPreferenceChange(Preference preference, Object newValue) {
 		ContentResolver resolver = getActivity().getContentResolver();
-        if (preference == mCarrierColorPicker) {
+        if (preference == mNotifAccentColorPicker) {
+            String hex = ColorPickerPreference.convertToARGB(
+                    Integer.valueOf(String.valueOf(newValue)));
+            preference.setSummary(hex);
+            int intHex = ColorPickerPreference.convertToColorInt(hex);
+            Settings.System.putInt(getActivity().getApplicationContext().getContentResolver(),
+                    Settings.System.NOTIF_ACCENT_COLOR, intHex);
+            return true;
+        } else if (preference == mCarrierColorPicker) {
             String hex = ColorPickerPreference.convertToARGB(
                     Integer.valueOf(String.valueOf(newValue)));
             preference.setSummary(hex);
             int intHex = ColorPickerPreference.convertToColorInt(hex);
             Settings.System.putInt(getActivity().getApplicationContext().getContentResolver(),
                     Settings.System.STATUS_BAR_CARRIER_COLOR, intHex);
+            return true;
+        } else if (preference == mNotifRandomAccentColor) {
+            boolean value = (Boolean) newValue;
+            Settings.System.putInt(resolver, Settings.System.NOTIF_ACCENT_COLOR_RANDOM, value ? 1 : 0);
+            return true;
+        } else if (preference == mNotifAccentColor) {
+            boolean value = (Boolean) newValue;
+            Settings.System.putInt(resolver, Settings.System.NOTIF_ACCENT_COLOR_DEFAULT, value ? 1 : 0);
             return true;
         } else if (preference == mStatusBarCarrier) {
             boolean value = (Boolean) newValue;
