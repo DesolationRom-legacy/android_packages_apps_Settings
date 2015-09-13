@@ -109,7 +109,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       		Log.i(TAG, "Path already exists: "+mStoragePath);
               }
       	getActivity().getApplicationContext().registerReceiver(receiver, filter);
-        Log.i(TAG, "Found "+mPrebuiltListLength+" prebuilt entries: "+staticentries);
+        Log.i(TAG, "Found "+mPrebuiltListLength+" prebuilt entries: "+Arrays.toString(staticentries));
     }
 
     @Override
