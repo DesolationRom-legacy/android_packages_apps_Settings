@@ -73,8 +73,9 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     Small explanation - mServer contains a dir which holds multiple zip files we base it off
     the baked in stock animation's sizes (480/800/1080/1440). This then gets passed in the form of a property
     to tell our download services which zip to request we then name it as the dir name ending in zip */
-    String[] staticentries = { "Stock", "8-Bit Arcade by @Scar45"	};
-    String[] staticvalues = { "/system/media/bootanimation.zip", "8bitarcade" };
+    private String[] staticentries = { "Stock", "8-Bit Arcade by @Scar45"	};
+    private String[] staticvalues = { "/system/media/bootanimation.zip", "8bitarcade" };
+    private int mPrebuiltListLength = staticentries.length;
     /* any questions do not hesitate to comment or email me - Snuzzo */
 
     @Override
@@ -108,6 +109,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       		Log.i(TAG, "Path already exists: "+mStoragePath);
               }
       	getActivity().getApplicationContext().registerReceiver(receiver, filter);
+        Log.i(TAG, "Found "+mPrebuiltListLength+" prebuilt entries: "+staticentries);
     }
 
     @Override
@@ -155,6 +157,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       	}
       	CharSequence[] entries = storagelist.toArray(staticentries);
       	CharSequence[] values = storagevalues.toArray(staticvalues);
+
       	mBootAnimSelect.setEntries(entries);
       	mBootAnimSelect.setEntryValues(values);
       	mBootAnimSelect.setValue(SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"));
@@ -180,9 +183,9 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       	mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[index]);
       	if (index == 0){ /*- file copy of our backup to revert baked to our baked in animation -*/
       		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.backup /system/media/bootanimation.zip && sysro").getStdout();
-      	} else if (index > staticentries.length){ /*- This a user selected custom animation -*/
+      	} else if (index > (mPrebuiltListLength - 1)){ /*- This a user selected custom animation -*/
       		CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf((String) newValue)+" /system/media/bootanimation.zip && sysro").getStdout();
-      	} else { /*- This a prebuilt downloaded zip file -*/
+      	} else if (index <= (mPrebuiltListLength - 1)) { /*- This a prebuilt downloaded zip file -*/
       		File destination = new File(mStoragePath+"/"+String.valueOf((String) newValue)+".bootani");
       		if (destination.exists()){
       			CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf(destination)+" /system/media/bootanimation.zip && sysro").getStdout();
