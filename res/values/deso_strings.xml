@@ -523,8 +523,8 @@
     <string name="notification_force_expand_title">Force expanded notification</string>
     <string name="notification_force_expand_summary">Force expanded notifications on all apps that support it</string>
 
-    <!-- Diable immersive messages -->
-    <string name="disable_immersive_message_title">Diable immersive messages</string>
+    <!-- Disable immersive messages -->
+    <string name="disable_immersive_message_title">Disable immersive messages</string>
     <string name="disable_immersive_message_summary">This will hide all immersive mode messages</string>
 
     <!-- Camera shutter sound -->
@@ -967,7 +967,7 @@
     <string name="status_bar_show_clock_second_title">Clock seconds</string>
 
     <!-- Statusbar Desolation logo -->
-    <string name="status_bar_bliss_logo_title">Desolation logo</string>
-    <string name="status_bar_bliss_logo_summary">Enable to show Desolation logo on the left side of statusbar</string>
+    <string name="status_bar_deso_logo_title">Desolation logo</string>
+    <string name="status_bar_deso_logo_summary">Enable to show Desolation logo on the left side of statusbar</string>
 
 </resources>
