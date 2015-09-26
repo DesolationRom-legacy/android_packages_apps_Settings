@@ -160,8 +160,6 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 
       	mBootAnimSelect.setEntries(entries);
       	mBootAnimSelect.setEntryValues(values);
-      	mBootAnimSelect.setValue(SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"));
-        mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[mBootAnimSelect.findIndexOfValue((String) SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"))]);
       	mBootAnimSelect.setOnPreferenceChangeListener(this);
     }
 
