@@ -160,8 +160,6 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 
       	mBootAnimSelect.setEntries(entries);
       	mBootAnimSelect.setEntryValues(values);
-      	mBootAnimSelect.setValue(SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"));
-        mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[mBootAnimSelect.findIndexOfValue((String) SystemProperties.get("persist.sys.deso.bootanimfile", "/system/media/bootanimation.zip"))]);
       	mBootAnimSelect.setOnPreferenceChangeListener(this);
     }
 
@@ -179,7 +177,6 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
   private void writeBootAnimSelect(Object newValue) {
       	int index = mBootAnimSelect.findIndexOfValue((String) newValue);
       	Log.i(TAG, "Index value "+index+" set to "+(mBootAnimSelect.getEntries()[index]));
-      	SystemProperties.set("persist.sys.deso.bootanimfile", String.valueOf((String) newValue));
       	mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[index]);
       	if (index == 0){ /*- file copy of our backup to revert baked to our baked in animation -*/
       		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.backup /system/media/bootanimation.zip && sysro").getStdout();
@@ -190,7 +187,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       		if (destination.exists()){
       			CMDProcessor.runSuCommand("sysrw && cp "+String.valueOf(destination)+" /system/media/bootanimation.zip && sysro").getStdout();
       		} else {
-      			downloadBootani(SystemProperties.get("persist.sys.deso.bootanimfile", null), mBootAnimSelect.getEntries()[index]);
+      			downloadBootani(String.valueOf((String) newValue), mBootAnimSelect.getEntries()[index]);
       		}
       	}
   }
