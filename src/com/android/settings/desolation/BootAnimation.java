@@ -62,6 +62,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
     private SwitchPreference mBootAnimDisable;
     private ListPreference mBootAnimSelect;
     private String mStoragePath;
+    private String mSelectedSummary;
     private static final String mServer = "http://snuzzo.android-edge.com/Roms/deso/deso-bootanis";
     long ref;
     File bootanimations;
@@ -84,6 +85,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
         addPreferencesFromResource(R.xml.boot_animation_settings);
         mBootAnimDisable = (SwitchPreference) findPreference(USE_BOOTANIMATION_KEY);
         mBootAnimSelect = (ListPreference) findPreference(SET_BOOTANIMATION_KEY);
+        mSelectedSummary = Settings.System.getString(getContentResolver(), Settings.System.SET_BOOTANIMATION_KEY);
         Log.i(TAG, "BootAnimations are set to "+(mBootAnimDisable.isChecked() ? true:false));
       	cManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
       	dmgr = (DownloadManager) this.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -109,13 +111,18 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       		Log.i(TAG, "Path already exists: "+mStoragePath);
               }
       	getActivity().getApplicationContext().registerReceiver(receiver, filter);
+        if (mSelectedSummary == null){
+            if ((Settings.System.putString(getContentResolver(), Settings.System.SET_BOOTANIMATION_KEY, "Stock")) == false){
+              mSelectedSummary = "Unknown";
+            }
+        }
         Log.i(TAG, "Found "+mPrebuiltListLength+" prebuilt entries: "+Arrays.toString(staticentries));
+        updateState();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateState();
     }
 
     @Override
@@ -160,6 +167,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
 
       	mBootAnimSelect.setEntries(entries);
       	mBootAnimSelect.setEntryValues(values);
+        mBootAnimSelect.setSummary(mSelectedSummary);
       	mBootAnimSelect.setOnPreferenceChangeListener(this);
     }
 
@@ -177,7 +185,11 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
   private void writeBootAnimSelect(Object newValue) {
       	int index = mBootAnimSelect.findIndexOfValue((String) newValue);
       	Log.i(TAG, "Index value "+index+" set to "+(mBootAnimSelect.getEntries()[index]));
-      	mBootAnimSelect.setSummary(mBootAnimSelect.getEntries()[index]);
+      	if (Settings.System.putString(getContentResolver(), Settings.System.SET_BOOTANIMATION_KEY, String.valueOf(mBootAnimSelect.getEntries()[index])) == true){
+          mSelectedSummary = String.valueOf(mBootAnimSelect.getEntries()[index]);
+        } else {
+          mSelectedSummary = "Unknown";
+        }
       	if (index == 0){ /*- file copy of our backup to revert baked to our baked in animation -*/
       		CMDProcessor.runSuCommand("sysrw && cp /system/media/bootanimation.backup /system/media/bootanimation.zip && sysro").getStdout();
       	} else if (index > (mPrebuiltListLength - 1)){ /*- This a user selected custom animation -*/
@@ -190,6 +202,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
       			downloadBootani(String.valueOf((String) newValue), mBootAnimSelect.getEntries()[index]);
       		}
       	}
+        mBootAnimSelect.setSummary(mSelectedSummary);
   }
 
   private void removePreference(Preference preference) {
@@ -210,7 +223,7 @@ public class BootAnimation extends SettingsPreferenceFragment implements Prefere
   public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
       	if (preference == mBootAnimDisable) {
       		writeUseBootAnimation();
-              	return true;
+          return true;
       	}
       	return super.onPreferenceTreeClick(preferenceScreen, preference);
   }
