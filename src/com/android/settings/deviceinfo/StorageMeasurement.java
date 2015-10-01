@@ -75,7 +75,8 @@ public class StorageMeasurement {
             Environment.DIRECTORY_PICTURES, Environment.DIRECTORY_MUSIC,
             Environment.DIRECTORY_ALARMS, Environment.DIRECTORY_NOTIFICATIONS,
             Environment.DIRECTORY_RINGTONES, Environment.DIRECTORY_PODCASTS,
-            Environment.DIRECTORY_DOWNLOADS, Environment.DIRECTORY_ANDROID);
+            Environment.DIRECTORY_DOWNLOADS, Environment.DIRECTORY_ANDROID,
+            Environment.DIRECTORY_MULTIROM, Environment.DIRECTORY_MULTIROM);
 
     @GuardedBy("sInstances")
     private static HashMap<StorageVolume, StorageMeasurement> sInstances = Maps.newHashMap();
