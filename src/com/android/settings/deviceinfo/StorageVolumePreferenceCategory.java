@@ -88,6 +88,7 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory
     private StorageItemPreference mItemDownloads;
     private StorageItemPreference mItemCache;
     private StorageItemPreference mItemMisc;
+    private StorageItemPreference mItemMR;
     private List<StorageItemPreference> mItemUsers = Lists.newArrayList();
 
     private boolean mUsbConnected;
@@ -196,6 +197,7 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory
         mItemDownloads = buildItem(R.string.memory_downloads_usage, R.color.memory_downloads);
         mItemCache = buildItem(R.string.memory_media_cache_usage, R.color.memory_cache);
         mItemMisc = buildItem(R.string.memory_media_misc_usage, R.color.memory_misc);
+        mItemMR = buildItem(R.string.memory_multirom_usage, R.color.memory_multirom);W
 
         mItemCache.setKey(KEY_CACHE);
 
@@ -211,6 +213,7 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory
             addPreference(mItemDownloads);
             addPreference(mItemCache);
             addPreference(mItemMisc);
+            addPreference(mItemMR);
 
             if (showUsers) {
                 addPreference(new PreferenceHeader(context, R.string.storage_other_users));
@@ -472,6 +475,9 @@ public class StorageVolumePreferenceCategory extends PreferenceCategory
 
         updatePreference(mItemCache, details.cacheSize);
         updatePreference(mItemMisc, details.miscSize);
+
+        final long multiromSize = totalValues(details.mediaSize, Environment.DIRECTORY_MULTIROM);
+        updatePreference(mItemMR, multiromSize);
 
         for (StorageItemPreference userPref : mItemUsers) {
             final long userSize = details.usersSize.get(userPref.userHandle);
